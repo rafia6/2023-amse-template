@@ -1,21 +1,32 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[50]:
+# In[48]:
 
 
 import pandas as pd
 import numpy as np
+from sqlalchemy import create_engine
 
 
-# In[69]:
+# In[49]:
 
 
 ####Extracting the Data into Dataframes####
-enforcement = pd.read_csv("https://offenedaten-konstanz.de/sites/default/files/Unfallatlas_Konstanz_Gesamt_2016-2019.csv"
-, sep=';')
-accidents = pd.read_csv("https://offenedaten-konstanz.de/sites/default/files/Blitzerdaten%20Jahresstatistik%202019.csv"
-)
+accidents = pd.read_csv("https://offenedaten-konstanz.de/sites/default/files/Unfallatlas_Konstanz_Gesamt_2016-2019.csv")
+enforcement = pd.read_csv("https://offenedaten-konstanz.de/sites/default/files/Blitzerdaten%20Jahresstatistik%202019.csv", sep=';')
+
+
+# In[50]:
+
+
+enforcement
+
+
+# In[51]:
+
+
+accidents
 
 
 # In[52]:
@@ -70,7 +81,7 @@ accidents['LightningCondition'].fillna(0, inplace = True)
 
 
 #Converting Month in Numerical Data
-enforcement.Month =pd.Categorical(enforcement.Month,['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember','Gesamt'], ordered=True)
+enforcement.Month =pd.Categorical(enforcement.Month,['Gesamt','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], ordered=True)
 enforcement.Month=enforcement.Month.cat.codes
 
 
@@ -85,15 +96,21 @@ enforcement.Location = enforcement.Location.cat.codes
 # In[57]:
 
 
-####Loading the Data to SQL####
-
-enforcement.to_sql('SpeedEnforcement', 'sqlite:///data.sqlite', if_exists='replace')
+createDb = create_engine("sqlite:///konstanz.db")
 
 
 # In[58]:
 
 
-accidents.to_sql('AccidentData', 'sqlite:///data.sqlite', if_exists='replace')
+####Loading the Data to SQL####
+
+enforcement.to_sql('SpeedEnforcement', createDb, if_exists='replace')
+
+
+# In[59]:
+
+
+accidents.to_sql('AccidentData', createDb, if_exists='replace')
 
 
 # In[ ]:
